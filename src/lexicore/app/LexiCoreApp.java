@@ -1,4 +1,4 @@
-package lexicore;
+package lexicore.app;
 
 public class LexiCoreApp {
 
