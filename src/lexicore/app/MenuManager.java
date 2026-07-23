@@ -2,6 +2,7 @@ package lexicore.app;
 
 import lexicore.AnalyticsDashboard;
 import lexicore.HuffmanCodec;
+import lexicore.TextPosition;
 import lexicore.core.TextEngine;
 import lexicore.input.InputManager;
 import lexicore.preprocessing.TextPreprocessor;
@@ -81,13 +82,11 @@ public class MenuManager {
                     break;
 
                 case 8:
-                    {replaceWord();}
+                    {positionalSearch();}
                     break;
 
                 case 9:
-                    showTeamFeatureComingSoon(
-                            "Atomic Word Replacement"
-                    );
+                    {replaceWord();}
                     break;
 
                 case 10:
@@ -280,6 +279,16 @@ public class MenuManager {
         }
 
         return true;
+    }
+
+    private void positionalSearch() {
+        System.out.print("Word or phrase: ");
+        List<TextPosition> matches = textEngine.search(scanner.nextLine());
+        if (matches.isEmpty()) System.out.println("No exact occurrences found.");
+        else {
+            System.out.println("Occurrences: " + matches.size());
+            matches.forEach(position -> System.out.println("  " + position));
+        }
     }
 
     private void replaceWord(){

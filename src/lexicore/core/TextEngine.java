@@ -1,5 +1,6 @@
 package lexicore.core;
 
+import lexicore.TextPosition;
 import lexicore.preprocessing.TextPreprocessor;
 
 import java.util.*;
@@ -144,6 +145,24 @@ public class TextEngine {
             new TextPreprocessor(this).processText();
         }
         return new ReplacementResult(mutations, System.nanoTime() - start);
+    }
+
+    public List<TextPosition> search(String rawQuery) {
+        String query = preprocess(rawQuery).replaceAll("[.!?]", "").trim();
+        if (query.isEmpty()) return new ArrayList<>();
+        String[] queryWords = query.split("\\s+");
+        List<TextPosition> found = new ArrayList<>();
+        for (int s = 0; s < sentences.size(); s++) {
+            List<String> sentence = sentences.get(s);
+            for (int w = 0; w <= sentence.size() - queryWords.length; w++) {
+                boolean match = true;
+                for (int q = 0; q < queryWords.length; q++) {
+                    if (!sentence.get(w + q).equals(queryWords[q])) { match = false; break; }
+                }
+                if (match) found.add(new TextPosition(s, w));
+            }
+        }
+        return found;
     }
 
     private String normalizeSingleWord(String input) {
