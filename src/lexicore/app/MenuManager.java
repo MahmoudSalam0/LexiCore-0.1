@@ -293,10 +293,10 @@ public class MenuManager {
 
     private void replaceWord(){
         System.out.println();
-        System.out.println("Enter word to replace: ");
+        System.out.print("Enter word to replace: ");
         String oldWord = scanner.nextLine().trim();
 
-        System.out.println("Enter the new word: ");
+        System.out.print("Enter the new word: ");
         String newWord = scanner.nextLine().trim();
         textEngine.replaceWord(oldWord, newWord);
     }
