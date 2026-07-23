@@ -1,5 +1,8 @@
 package lexicore.app;
 
+import lexicore.AnalyticsDashboard;
+import lexicore.HuffmanCodec;
+import lexicore.TextPosition;
 import lexicore.core.TextEngine;
 import lexicore.input.InputManager;
 import lexicore.preprocessing.TextPreprocessor;
@@ -75,21 +78,15 @@ public class MenuManager {
                     break;
 
                 case 7:
-                    showTeamFeatureComingSoon(
-                            "Local Analytics Dashboard"
-                    );
+                    {new AnalyticsDashboard().print(textEngine);}
                     break;
 
                 case 8:
-                    showTeamFeatureComingSoon(
-                            "Positional Search Engine"
-                    );
+                    {positionalSearch();}
                     break;
 
                 case 9:
-                    showTeamFeatureComingSoon(
-                            "Atomic Word Replacement"
-                    );
+                    {replaceWord();}
                     break;
 
                 case 10:
@@ -105,11 +102,8 @@ public class MenuManager {
                     break;
 
                 case 12:
-                    showTeamFeatureComingSoon(
-                            "Cellular Text Compression"
-                    );
+                    {compress();}
                     break;
-
                 case 0:
                     running = false;
                     System.out.println();
@@ -220,7 +214,7 @@ public class MenuManager {
             return;
         }
 
-        List<String> sentences = textEngine.getSentences();
+        List<List<String>> sentences = textEngine.getSentences();
 
         System.out.println();
         System.out.println("Extracted Sentences:");
@@ -287,6 +281,26 @@ public class MenuManager {
         return true;
     }
 
+    private void positionalSearch() {
+        System.out.print("Word or phrase: ");
+        List<TextPosition> matches = textEngine.search(scanner.nextLine());
+        if (matches.isEmpty()) System.out.println("No exact occurrences found.");
+        else {
+            System.out.println("Occurrences: " + matches.size());
+            matches.forEach(position -> System.out.println("  " + position));
+        }
+    }
+
+    private void replaceWord(){
+        System.out.println();
+        System.out.print("Enter word to replace: ");
+        String oldWord = scanner.nextLine().trim();
+
+        System.out.print("Enter the new word: ");
+        String newWord = scanner.nextLine().trim();
+        textEngine.replaceWord(oldWord, newWord);
+    }
+
     private void showAutocompleteComingSoon() {
 
         if (!validateTextLoaded()) {
@@ -308,5 +322,14 @@ public class MenuManager {
         System.out.println(
                 "This feature will be implemented by another team member."
         );
+    }
+
+    private void compress() {
+        HuffmanCodec.CompressionResult result = new HuffmanCodec().compress(textEngine.getCurrentText());
+        System.out.println("Original UTF-8 size : " + result.getOriginalBytes() + " bytes");
+        System.out.println("Compressed payload  : " + result.getCompressedBits() + " bits ("
+                + result.getCompressedBytes() + " bytes, excluding codebook metadata)");
+        System.out.printf("Estimated saving    : %.2f%%%n", result.getSavingPercent());
+        System.out.println("Huffman symbols     : " + result.getCodes().size());
     }
 }

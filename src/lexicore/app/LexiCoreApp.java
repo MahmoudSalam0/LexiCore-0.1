@@ -17,8 +17,7 @@ public class LexiCoreApp {
         InputManager inputManager =
                 new InputManager(scanner);
 
-        TextPreprocessor textPreprocessor =
-                new TextPreprocessor(textEngine);
+        TextPreprocessor textPreprocessor = new TextPreprocessor(textEngine);
 
         MenuManager menuManager = new MenuManager(
                 scanner,

@@ -2,13 +2,18 @@ package lexicore.preprocessing;
 
 import lexicore.core.TextEngine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class TextPreprocessor {
 
     private final TextEngine textEngine;
+
+    private final List<List<String>> sentences = new ArrayList<>();
+    private final List<String> words = new ArrayList<>();
+    private final Map<String, Integer> wordFrequency = new HashMap<>();
+    private final Map<Character, Integer> characterFrequency = new HashMap<>();
+    private final Set<String> vocabulary = new HashSet<>();
+    private final Deque<String> undoStates = new ArrayDeque<>();
 
     public TextPreprocessor(TextEngine textEngine) {
         if (textEngine == null) {
@@ -21,60 +26,51 @@ public class TextPreprocessor {
     public void processText() {
         String currentText = textEngine.getCurrentText();
 
-        if (currentText.isBlank()) {
+        /*if (currentText.isBlank()) {
             textEngine.updateProcessedData(
                     "",
                     new ArrayList<>(),
                     new ArrayList<>()
             );
             return;
-        }
+        }*/
 
-        List<String> sentences = extractSentences(currentText);
-        List<String> words = extractWords(currentText);
+        preprocess(currentText);
         String processedText = String.join(" ", words);
 
         textEngine.updateProcessedData(
                 processedText,
                 sentences,
-                words
+                words,
+                vocabulary,
+                characterFrequency,
+                wordFrequency
         );
     }
 
-    private List<String> extractSentences(String text) {
-        List<String> sentences = new ArrayList<>();
-
+    private void preprocess(String text) {
         String[] sentenceParts = text.split("[.!?]+");
 
-        for (String sentence : sentenceParts) {
-            String cleanedSentence = cleanText(sentence);
+        for (String rawSentence : sentenceParts) {
 
-            if (!cleanedSentence.isBlank()) {
-                sentences.add(cleanedSentence);
+            String cleanedSentence = cleanText(rawSentence);
+            List<String> sentence = new ArrayList<>();
+
+            if (!cleanedSentence.isBlank()){
+                for (String word : cleanedSentence.split("\\s+")) {
+                    sentence.add(word);
+                    words.add(word);
+                    vocabulary.add(word);
+                    wordFrequency.merge(word, 1, Integer::sum);
+                }
             }
+            if (!sentence.isEmpty()) sentences.add(sentence);
         }
 
-        return sentences;
-    }
-
-    private List<String> extractWords(String text) {
-        List<String> words = new ArrayList<>();
-
-        String cleanedText = cleanText(text);
-
-        if (cleanedText.isBlank()) {
-            return words;
+        for (char ch : text.toCharArray()) {
+            if (!Character.isWhitespace(ch)) characterFrequency.merge(ch, 1, Integer::sum);
         }
 
-        String[] wordParts = cleanedText.split("\\s+");
-
-        for (String word : wordParts) {
-            if (!word.isBlank()) {
-                words.add(word);
-            }
-        }
-
-        return words;
     }
 
     private String cleanText(String text) {
